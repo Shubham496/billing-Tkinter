@@ -10,20 +10,35 @@ center = WINDOW_SIZE_X//2
 
 
 def genrate_bill():
+    # blank text to print bill
     bill_text = ""
+
+    # total bill 
     total = 0
+
+    # loop to go through all items
     for i in LABLES:
+        # getting quantity of each item
         a =  LABLES[i][2].get()
-        print(a)
+        # creating a place holder - if a =0 or none or error 
         qty = None
+
+        # cheking if quantity is a number
         if str(a).strip().isdigit():
+
+            # if quantity is a number, then assinging it to qty
             qty = int(str(LABLES[i][2].get()).strip())
+
+        # if quantity is blank or error 
         qty = qty or 0
 
+        # generating total bill
         total += LABLES[i][1] * qty
+
+        # adding all the item, their names, price, quantity and total
         bill_text += f'{i} : ₹ {LABLES[i][1]} X {qty}  =  {LABLES[i][1] * qty} \n'
 
-        #print(LABLES[i])
+    # grand total
     bill_text += f"Total bill is ₹ {total}"
     print(bill_text)
 
