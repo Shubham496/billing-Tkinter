@@ -11,8 +11,21 @@ center = WINDOW_SIZE_X//2
 
 def genrate_bill():
     bill_text = ""
+    total = 0
     for i in LABLES:
-        print(i)
+        a =  LABLES[i][2].get()
+        print(a)
+        qty = None
+        if str(a).strip().isdigit():
+            qty = int(str(LABLES[i][2].get()).strip())
+        qty = qty or 0
+
+        total += LABLES[i][1] * qty
+        bill_text += f'{i} : ₹ {LABLES[i][1]} X {qty}  =  {LABLES[i][1] * qty} \n'
+
+        #print(LABLES[i])
+    bill_text += f"Total bill is ₹ {total}"
+    print(bill_text)
 
 
 
