@@ -1,10 +1,36 @@
 # importing libraries
 import tkinter as tk
+import sqlite3
+
+
+myconnection = sqlite3.connect('mydbfile.db')
+curr = myconnection.cursor()
+curr.execute('''
+    CREATE TABLE IF NOT EXISTS orders (
+        id INTEGER PRIMARY KEY,
+        order_id integer,
+        item TEXT NOT NULL,
+        price integer,
+        quantity integer
+    )
+''')
+
+curr.close()
+
+
 
 
 WINDOW_SIZE_X = 500
 WINDOW_SIZE_Y = 300
 center = WINDOW_SIZE_X//2
+
+def get_next_order_id():
+    myconnection = sqlite3.connect('mydbfile.db')
+    cursor = myconnection.cursor()
+    cursor.execute("SELECT MAX(order_id) FROM orders")
+    result = cursor.fetchone()[0]
+    myconnection.close()
+    return 1 if result is None else result + 1
 
 
 
@@ -15,6 +41,12 @@ def genrate_bill():
 
     # total bill 
     total = 0
+
+    order_id = get_next_order_id()
+    print(order_id)
+
+    myconnection = sqlite3.connect('mydbfile.db')
+    curr = myconnection.cursor()
 
     # loop to go through all items
     for i in LABLES:
@@ -35,14 +67,23 @@ def genrate_bill():
         # generating total bill
         total += LABLES[i][1] * qty
 
+        curr.execute("""
+                     INSERT INTO orders 
+                     (order_id, item, price , quantity)
+                     values
+                     (?, ?, ?, ?) """, (order_id, i, LABLES[i][1], qty))
+        
+        
+        
         # adding all the item, their names, price, quantity and total
         bill_text += f'{i} : ₹ {LABLES[i][1]} X {qty}  =  {LABLES[i][1] * qty} \n'
+
 
     # grand total
     bill_text += f"Total bill is ₹ {total}"
     print(bill_text)
 
-
+    curr.close()
 
 
 
@@ -75,35 +116,10 @@ LABLES = {}
 
 
 
+items = {"namkeen": 50, "SoftDrink": 40, "chips": 20}
 
-
-
-Namkeen = tk.Label(text = "Namkeen", font=("arial", 12, "bold"))
-Q_Namkeen = tk.Entry()
-LABLES["Namkeen"]  = [Namkeen, 50, Q_Namkeen]
-
-
-
-
-
-
-
-
-
-
-
-SoftDrink = tk.Label(text = "SoftDrink", font=("arial", 12, "bold"))
-Q_SoftDrink = tk.Entry()
-LABLES["SoftDrink"]  = [SoftDrink, 40, Q_SoftDrink]
-
-Chips = tk.Label(text = "Chips", font=("arial", 12, "bold"))
-Q_Chips = tk.Entry()
-LABLES["Chips"]  = [Chips, 20, Q_Chips]
-
-Chocolates = tk.Label(text = "Chocolates", font=("arial", 12, "bold"))
-Q_Chocolates = tk.Entry()
-LABLES["Chocolates"]  = [Chocolates, 100, Q_Chocolates]
-
+for i in items:
+    LABLES[i] = [tk.Label(text = f"{i}", font=("arial", 12, "bold")), items[i], tk.Entry()]
 
 
 
@@ -140,3 +156,4 @@ for i in LABLES:
 
 # running the window
 root.mainloop()
+
